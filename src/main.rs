@@ -54,7 +54,7 @@ enum Command {
         #[clap(long)]
         spotify: bool,
 
-        /// Sync current volume.
+        /// Sync volume between both computers.
         #[clap(long)]
         sync_volume: bool,
     },
@@ -219,10 +219,13 @@ async fn main() -> anyhow::Result<()> {
                 .await?;
 
                 spotify
-                    .transfer_playback(match target {
-                        SyncAudioTo::Local => &spotify_name_local,
-                        SyncAudioTo::Remote => &spotify_name_remote,
-                    })
+                    .transfer_playback(
+                        match target {
+                            SyncAudioTo::Local => &spotify_name_local,
+                            SyncAudioTo::Remote => &spotify_name_remote,
+                        },
+                        sync_volume,
+                    )
                     .await?
             }
         }
