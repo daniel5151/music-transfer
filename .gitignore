@@ -1,0 +1,4 @@
+/target
+
+.spotify_token_cache.json
+music_transfer_config.json
