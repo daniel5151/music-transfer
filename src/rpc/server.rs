@@ -17,6 +17,8 @@ impl AudioServer {
     pub async fn run(self) -> anyhow::Result<()> {
         let audio = crate::controllers::volume::VolumeController::new_system_default()
             .context("failed to init system volume controller")?;
+        let power = crate::controllers::power::PowerController::new_system_default()
+            .context("failed to init system power controller")?;
 
         let addr = format!("0.0.0.0:{}", self.port);
         log::info!("binding `music-transfer` server to {}", addr);
@@ -48,6 +50,7 @@ impl AudioServer {
                         .context("invalid volume sent from client")?;
 
                     audio.set_master_volume(new_vol)?;
+                    power.wake_screen()?;
                 }
                 b'g' => {
                     let current_volume = audio.get_master_volume()?;

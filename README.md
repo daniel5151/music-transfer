@@ -2,6 +2,11 @@
 
 A small utility to seamlessly transfer music playback between two computers.
 
+Before you get too excited - no, there isn't any fancy over-the-network music
+streaming going on. `music-transfer` is basically just a wrapper around the
+Spotify Connect API (for music handoff) + a simple client/server app to sync
+system volume.
+
 `music-transfer` was designed with
 [`display-switch`](https://github.com/haimgel/display-switch) in mind, as I
 wanted seamless spotify handoff between my work/personal PC.
@@ -15,6 +20,27 @@ If you'd like to contribute volume sync functionality for MacOS/Linux/etc, PRs
 are more than welcome!
 
 * * *
+
+## Example: Using `music-transfer` alongside `display-switch`
+
+As mentioned earlier, `music-transfer` was designed to integrate nicely with
+[`display-switch`](https://github.com/haimgel/display-switch).
+
+Here's a copy of the `display-switch.ini` that I use to achieve seamless music
+handoff as part of the KVM switch.
+
+```ini
+usb_device = "1532:005C"
+on_usb_connect = "DisplayPort1"
+on_usb_disconnect = "Hdmi1"
+
+on_usb_connect_execute = "'C:\\Users\\daprilik\\bin\\music-transfer.exe' --config-path 'C:\\Users\\daprilik\\bin\\music_transfer_config.json' --spotify-token-cache-path 'C:\\Users\\daprilik\\bin\\.spotify_token_cache.json' transfer local --sync-volume --spotify"
+on_usb_disconnect_execute = "'C:\\Users\\daprilik\\bin\\music-transfer.exe' --config-path 'C:\\Users\\daprilik\\bin\\music_transfer_config.json' --spotify-token-cache-path 'C:\\Users\\daprilik\\bin\\.spotify_token_cache.json' transfer remote --sync-volume --spotify"
+```
+
+Note that you _could_ avoid explicitly passing `--config-path` and
+`--spotify-token-cache-path` by figuring out which working directory
+`display-switch.exe` is run from, but I prefer to be explicit over implicit.
 
 ## Setup
 
@@ -105,22 +131,3 @@ running an instance of `music-transfer audio-server`.
 - `remote_host`: Hostname of remote computer (e.g: IP address, `.local` addr)
 - `remote_port`: Port to connect to on the remote computer
 
-## Example: Using `music-transfer` alongside `display-switch`
-
-Like I mentioned at the top of this README, `music-transfer` was designed with
-[`display-switch`](https://github.com/haimgel/display-switch) in mind, as I
-wanted seamless spotify handoff between my work/personal PC.
-
-Here's a copy of the `display-switch.ini` that I use to achieve this.
-
-```ini
-usb_device = "1532:005C"
-on_usb_connect = "DisplayPort1"
-on_usb_disconnect = "Hdmi1"
-on_usb_connect_execute = "'C:\\Users\\daprilik\\bin\\music-transfer.exe' --config-path 'C:\\Users\\daprilik\\bin\\music_transfer_config.json' --spotify-token-cache-path 'C:\\Users\\daprilik\\bin\\.spotify_token_cache.json' transfer local --sync-volume --spotify"
-on_usb_disconnect_execute = "'C:\\Users\\daprilik\\bin\\music-transfer.exe' --config-path 'C:\\Users\\daprilik\\bin\\music_transfer_config.json' --spotify-token-cache-path 'C:\\Users\\daprilik\\bin\\.spotify_token_cache.json' transfer remote --sync-volume --spotify"
-```
-
-Note that you _could_ avoid explicitly passing `--config-path` and
-`--spotify-token-cache-path` by figuring out which working directory
-`display-switch.exe` is run from, but I prefer to be explicit over implicit.
